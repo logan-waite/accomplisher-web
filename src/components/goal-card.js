@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import {
   Card,
-  CardActions,
   CardContent,
   Collapse,
   List,
@@ -19,7 +18,7 @@ const GoalCard = props => (
       className={props.classes.content}
       onClick={props.onExpandClick}
     >
-      <Typography>This is a goal card</Typography>
+      <Typography>{props.goal.title}</Typography>
       <FontAwesomeIcon
         icon={faChevronDown}
         className={classnames(props.classes.expand, {

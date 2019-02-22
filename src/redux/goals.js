@@ -5,9 +5,9 @@ const stateKey = 'goals'
 
 const initialState = {
   list: [
-    { title: 'Cool goal 1', setDate: '2018-01-01' },
-    { title: 'Cool goal 2', setDate: '2018-01-02' },
-    { title: 'Cool goal 3', setDate: '2018-01-03' }
+    { id: 1, title: 'Cool goal 1', setDate: '2018-01-01' },
+    { id: 2, title: 'Cool goal 2', setDate: '2018-01-02' },
+    { id: 3, title: 'Cool goal 3', setDate: '2018-01-03' }
   ]
 }
 

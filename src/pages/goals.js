@@ -16,12 +16,13 @@ class Goals extends Component {
     super(props)
 
     this.state = {
-      expanded: false
+      expandedGoal: null
     }
   }
 
-  handleExpandClick = () => {
-    this.setState(state => ({ expanded: !state.expanded }))
+  handleExpandClick = key => event => {
+    let newExpandedGoal = this.state.expandedGoal === key ? 0 : key
+    this.setState(state => ({ expandedGoal: newExpandedGoal }))
   }
 
   render () {
@@ -29,11 +30,14 @@ class Goals extends Component {
     return (
       <div className={this.props.classes.root}>
         <div className={this.props.classes.container}>
-          <GoalCard onExpandClick={this.handleExpandClick} />
-          <GoalCard />
-          <GoalCard />
-          <GoalCard />
-          <GoalCard />
+          {this.props.goals.map((goal, index) => (
+            <GoalCard
+              key={goal.id}
+              onExpandClick={this.handleExpandClick(goal.id)}
+              expanded={this.state.expandedGoal === goal.id}
+              goal={goal}
+            />
+          ))}
         </div>
       </div>
     )
@@ -54,6 +58,6 @@ const styles = theme => ({
 })
 
 export default R.pipe(
-  connect(mapStateToProps),
-  withStyles(styles)
+  withStyles(styles),
+  connect(mapStateToProps)
 )(Goals)
