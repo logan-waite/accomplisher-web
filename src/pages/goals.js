@@ -26,11 +26,10 @@ class Goals extends Component {
   }
 
   render () {
-    console.log(this.props)
     return (
       <div className={this.props.classes.root}>
         <div className={this.props.classes.container}>
-          {this.props.goals.map((goal, index) => (
+          {R.values(this.props.goals).map((goal, index) => (
             <GoalCard
               key={goal.id}
               onExpandClick={this.handleExpandClick(goal.id)}

@@ -4,13 +4,14 @@ import {
   CardContent,
   Collapse,
   List,
-  ListItem,
   Typography,
   withStyles
 } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown } from '@fortawesome/pro-regular-svg-icons'
 import classnames from 'classnames'
+import ActionStep from 'src/components/action-step'
+import * as R from 'ramda'
 
 const GoalCard = props => (
   <Card className={props.classes.goalCard}>
@@ -29,9 +30,13 @@ const GoalCard = props => (
     <Collapse in={props.expanded} timeout='auto' unmountOnExit>
       <CardContent>
         <List>
-          <ListItem>
-            <Typography>Hello?</Typography>
-          </ListItem>
+          {R.values(props.goal.actionSteps).map((actionStep, index) => (
+            <ActionStep
+              key={index}
+              actionStep={actionStep}
+              goalId={props.goal.id}
+            />
+          ))}
         </List>
       </CardContent>
     </Collapse>
