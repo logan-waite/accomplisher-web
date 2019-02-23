@@ -96,6 +96,28 @@ const initialState = {
           title: 'finish him'
         }
       }
+    },
+    4: {
+      id: 4,
+      title: 'Cool goal 3',
+      setDate: '2018-01-03',
+      actionSteps: {
+        8: {
+          id: 8,
+          completed: true,
+          title: 'setp the first'
+        },
+        9: {
+          id: 9,
+          completed: false,
+          title: 'the second step'
+        },
+        10: {
+          id: 10,
+          completed: false,
+          title: 'finish him'
+        }
+      }
     }
   }
 }

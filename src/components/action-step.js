@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquare } from '@fortawesome/pro-regular-svg-icons'
-import { faCheckSquare } from '@fortawesome/free-solid-svg-icons'
+import { faCheckSquare } from '@fortawesome/pro-solid-svg-icons'
 import { Creators } from 'src/redux/goals'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
@@ -30,18 +30,26 @@ const ActionStep = props => {
   }
 
   return (
-    <ListItem className={props.classes.actionStep} onClick={handleClick}>
-      <Typography>{props.actionStep.title}</Typography>
-      <ListItemSecondaryAction>
-        <FontAwesomeIcon icon={icon} className={props.classes.checkbox} />
-      </ListItemSecondaryAction>
-    </ListItem>
+    <div onClick={handleClick}>
+      <ListItem className={props.classes.actionStep}>
+        <Typography className={props.classes.actionStep}>
+          {props.actionStep.title}
+        </Typography>
+        <ListItemSecondaryAction>
+          <FontAwesomeIcon
+            icon={icon}
+            size='lg'
+            className={props.classes.checkbox}
+          />
+        </ListItemSecondaryAction>
+      </ListItem>
+    </div>
   )
 }
 
 const styles = {
-  checkbox: {
-    // marginRight: '15px'
+  actionStep: {
+    fontSize: 16
   }
 }
 

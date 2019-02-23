@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import GoalCard from 'src/components/goal-card'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Fab } from '@material-ui/core'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 import { stateKey } from 'src/redux/goals'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus } from '@fortawesome/pro-regular-svg-icons'
 
 const mapStateToProps = state => {
   return {
@@ -37,6 +39,13 @@ class Goals extends Component {
               goal={goal}
             />
           ))}
+          <Fab
+            color='secondary'
+            aria-label='Add'
+            className={this.props.classes.fab}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </Fab>
         </div>
       </div>
     )
@@ -49,10 +58,18 @@ const styles = theme => ({
     justifyContent: 'center'
   },
   container: {
+    position: 'relative',
     display: 'flex',
     maxWidth: 960,
     flexWrap: 'wrap',
     flexDirection: 'row'
+  },
+  fab: {
+    position: 'absolute',
+    right: '-56px',
+    top: '-39px',
+    zIndex: theme.zIndex.appBar + 1
+    // backgroundColor: 'green'
   }
 })
 

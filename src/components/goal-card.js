@@ -5,7 +5,8 @@ import {
   Collapse,
   List,
   Typography,
-  withStyles
+  withStyles,
+  Divider
 } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown } from '@fortawesome/pro-regular-svg-icons'
@@ -14,12 +15,12 @@ import ActionStep from 'src/components/action-step'
 import * as R from 'ramda'
 
 const GoalCard = props => (
-  <Card className={props.classes.goalCard}>
+  <Card className={props.classes.root}>
     <CardContent
       className={props.classes.content}
       onClick={props.onExpandClick}
     >
-      <Typography>{props.goal.title}</Typography>
+      <Typography variant='h6'>{props.goal.title}</Typography>
       <FontAwesomeIcon
         icon={faChevronDown}
         className={classnames(props.classes.expand, {
@@ -28,7 +29,8 @@ const GoalCard = props => (
       />
     </CardContent>
     <Collapse in={props.expanded} timeout='auto' unmountOnExit>
-      <CardContent>
+      <Divider variant='middle' />
+      <CardContent className={props.classes.items}>
         <List>
           {R.values(props.goal.actionSteps).map((actionStep, index) => (
             <ActionStep
@@ -44,7 +46,7 @@ const GoalCard = props => (
 )
 
 const styles = theme => ({
-  goalCard: {
+  root: {
     width: 300,
     margin: 10,
     height: 'fit-content'
@@ -52,7 +54,17 @@ const styles = theme => ({
   content: {
     width: '100%',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    padding: 14,
+    '&:last-child': {
+      paddingBottom: 14
+    }
+  },
+  items: {
+    padding: 14,
+    '&:last-child': {
+      paddingBottom: 14
+    }
   },
   expand: {
     transform: 'rotate(0deg)',
