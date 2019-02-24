@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import GoalCard from 'src/components/goal-card'
-import { withStyles, Fab } from '@material-ui/core'
+import { withStyles, Fab, Modal } from '@material-ui/core'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 import { stateKey } from 'src/redux/goals'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/pro-regular-svg-icons'
+import AddGoal from 'src/pages/add-goal'
 
 const mapStateToProps = state => {
   return {
@@ -18,13 +19,18 @@ class Goals extends Component {
     super(props)
 
     this.state = {
-      expandedGoal: null
+      expandedGoal: null,
+      modalOpen: true
     }
   }
 
   handleExpandClick = key => event => {
     let newExpandedGoal = this.state.expandedGoal === key ? 0 : key
-    this.setState(state => ({ expandedGoal: newExpandedGoal }))
+    this.setState({ expandedGoal: newExpandedGoal })
+  }
+
+  toggleModal = () => {
+    this.setState({ modalOpen: !this.state.modalOpen })
   }
 
   render () {
@@ -43,10 +49,19 @@ class Goals extends Component {
             color='secondary'
             aria-label='Add'
             className={this.props.classes.fab}
+            onClick={this.toggleModal}
           >
             <FontAwesomeIcon icon={faPlus} />
           </Fab>
         </div>
+        <Modal
+          aria-labelledby='simple-modal-title'
+          aria-describedby='simple-modal-description'
+          open={this.state.modalOpen}
+          onClose={this.toggleModal}
+        >
+          <AddGoal />
+        </Modal>
       </div>
     )
   }

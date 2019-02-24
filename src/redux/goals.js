@@ -135,14 +135,6 @@ const addGoal = (state, { title, completedDate }) => {
 
 const fetchGoals = state => state
 
-const func = (state, { goalId, actionStepId, newStatus }) => {
-  const actionStep = state.list
-    .flatMap(goal => goal.actionSteps)
-    .filter(actionStep => actionStep.id === actionStepId)
-  console.log(actionStep)
-  return state
-}
-
 const reducers = createReducer(initialState, {
   [Types.ADD_GOAL]: addGoal,
   [Types.FETCH_GOALS]: fetchGoals,
