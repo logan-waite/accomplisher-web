@@ -1,27 +1,37 @@
-import React, { useRef, useEffect } from 'react'
-import { Typography, withStyles, TextField, Button } from '@material-ui/core'
+import React, { useRef, useEffect, useState } from 'react'
+import {
+  Typography,
+  withStyles,
+  TextField,
+  Button,
+  List
+} from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/pro-regular-svg-icons'
+import * as R from 'ramda'
+import ActionStep from 'src/components/action-step'
 
-const Title = ({ classes, name, handleChange }) => (
-  <div>
-    <Typography paragraph>
-      Choose a goal you would like to complete. Try to pick one you could do in
-      30 days, so you can start filling up your accomplishment board.
-    </Typography>
-    <TextField
-      name='goalTitle'
-      id='goal-title'
-      label='Goal Title'
-      className={classes.textField}
-      value={name}
-      onChange={handleChange}
-      margin='normal'
-      variant='outlined'
-      fullWidth
-    />
-  </div>
-)
+const Title = ({ classes, name, handleChange }) => {
+  return (
+    <div>
+      <Typography paragraph>
+        Choose a goal you would like to complete. Try to pick one you could do
+        in 30 days, so you can start filling up your accomplishment board.
+      </Typography>
+      <TextField
+        name='goalTitle'
+        id='goal-title'
+        label='Goal Title'
+        className={classes.textField}
+        value={name}
+        onChange={handleChange}
+        margin='normal'
+        variant='outlined'
+        fullWidth
+      />
+    </div>
+  )
+}
 
 const ActionSteps = ({
   classes,
@@ -30,25 +40,31 @@ const ActionSteps = ({
   handleAddAction
 }) => {
   const endDiv = useRef(null)
-  useEffect(() => {
-    endDiv.current.scrollIntoView()
-  })
+
+  useEffect(
+    () => {
+      endDiv.current.scrollIntoView()
+    },
+    [R.values(actionSteps).length]
+  )
   return (
     <div className={classes.root}>
       <Typography paragraph>
         List out the steps that you can take to help you achieve your goal. Each
-        step should only take around one day to complete.
+        step should only take around one day to complete. Don't worry about the
+        order you'll do them in, we'll take care of that later.
       </Typography>
       <div className={classes.actionStepWrapper}>
-        {actionSteps.map((actionStep, index) => {
+        {R.values(actionSteps).map((actionStep, index) => {
+          let num = index + 1
           return (
             <TextField
               key={index}
-              name={`actionStep${index}`}
-              id={`action-step-${index}`}
-              label={`Action Step ${index + 1}`}
+              name={`actionStep${num}`}
+              id={`action-step-${num}`}
+              label={`Action Step ${num}`}
               className={classes.textField}
-              value={actionStep}
+              value={actionStep.title}
               onChange={handleChange}
               margin='normal'
               variant='outlined'
@@ -70,20 +86,28 @@ const ActionSteps = ({
   )
 }
 
-const ChooseActionStep = props => (
-  <div>
-    <Typography paragraph>
-      Now choose the first action step that you will do to start working towards
-      your goal.
-    </Typography>
-  </div>
-)
-
-const scrollToTop = (scrollToDiv, parentDiv) => {
-  let topPos = scrollToDiv.offsetTop
-  console.log({ topPos, parentDiv: parentDiv.scrollTop })
-  parentDiv.scrollTop = topPos
-  console.log({ parentDiv: parentDiv.scrollTop })
+const ChooseActionStep = props => {
+  return (
+    <div>
+      <Typography paragraph>
+        Now choose the first action step that you will do to start working
+        towards your goal.
+      </Typography>
+      <div className={props.classes.actionStepWrapper}>
+        <List>
+          {R.values(props.actionSteps).map(actionStep => (
+            <ActionStep
+              radio
+              key={actionStep.id}
+              actionStep={actionStep}
+              isChecked={props.nextActionStep === actionStep.id}
+              handleClick={props.handleSelectActionStep(actionStep.id)}
+            />
+          ))}
+        </List>
+      </div>
+    </div>
+  )
 }
 
 class AddGoal extends React.Component {
@@ -93,8 +117,17 @@ class AddGoal extends React.Component {
     this.state = {
       screenPosition: 0,
       goalTitle: '',
-      actionSteps: ['', '', '']
+      actionSteps: {
+        1: { id: 1, title: '', completed: false },
+        2: { id: 2, title: '', completed: false },
+        3: { id: 3, title: '', completed: false }
+      },
+      nextActionStep: 0
     }
+  }
+
+  handleSelectActionStep = actionStepId => event => {
+    this.setState({ nextActionStep: actionStepId })
   }
 
   handleChange = event => {
@@ -104,7 +137,7 @@ class AddGoal extends React.Component {
     if (name.indexOf('actionStep') > -1) {
       var index = name.slice(10)
       var actionSteps = this.state.actionSteps
-      actionSteps[index] = value
+      actionSteps[index].title = value
       this.setState({ actionSteps })
     } else {
       this.setState({ [name]: value })
@@ -122,7 +155,16 @@ class AddGoal extends React.Component {
   }
 
   handleAddAction = event => {
-    var actionSteps = this.state.actionSteps.concat([''])
+    var length = Object.keys(this.state.actionSteps).length
+    var actionSteps = R.assoc(
+      length + 1,
+      {
+        id: length + 1,
+        title: '',
+        completed: false
+      },
+      this.state.actionSteps
+    )
     this.setState({ actionSteps })
   }
 
@@ -132,7 +174,7 @@ class AddGoal extends React.Component {
         <Title
           classes={this.props.classes}
           handleChange={this.handleChange}
-          name={this.state.name}
+          name={this.state.goalTitle}
         />
       )
     } else if (this.state.screenPosition === 1) {
@@ -145,8 +187,33 @@ class AddGoal extends React.Component {
         />
       )
     } else if (this.state.screenPosition === 2) {
-      return <ChooseActionStep />
+      return (
+        <ChooseActionStep
+          classes={this.props.classes}
+          actionSteps={this.state.actionSteps}
+          nextActionStep={this.state.nextActionStep}
+          handleSelectActionStep={this.handleSelectActionStep}
+        />
+      )
     }
+  }
+
+  disableButton = () => {
+    if (this.state.screenPosition === 0 && this.state.goalTitle === '') {
+      return true
+    } else if (
+      this.state.screenPosition === 1 &&
+      R.values(this.state.actionSteps).filter(
+        actionStep => actionStep.title === ''
+      ).length > 0
+    ) {
+      return true
+    } else if (
+      this.state.screenPosition === 2 &&
+      this.state.nextActionStep === 0
+    ) {
+      return true
+    } else return false
   }
 
   render () {
@@ -157,6 +224,7 @@ class AddGoal extends React.Component {
         </Typography>
         {this.getCurrentScreen()}
         <Button
+          disabled={this.disableButton()}
           variant='contained'
           color='primary'
           className={this.props.classes.nextButton}
@@ -176,15 +244,18 @@ const styles = theme => ({
   },
   actionStepWrapper: {
     overflowY: 'auto',
-    maxHeight: theme.spacing.unit * 29
+    maxHeight: 240,
+    '&:firstChild': {
+      marginTop: 0
+    }
   },
   paper: {
     position: 'absolute',
     left: '50%',
     top: '50%',
     transform: 'translate(-50%, -50%)',
-    maxWidth: theme.spacing.unit * 60,
-    maxHeight: theme.spacing.unit * 60,
+    maxWidth: 500,
+    maxHeight: 600,
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing.unit * 4,

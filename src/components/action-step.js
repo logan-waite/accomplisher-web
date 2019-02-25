@@ -6,31 +6,24 @@ import {
   ListItemSecondaryAction
 } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSquare } from '@fortawesome/pro-regular-svg-icons'
-import { faCheckSquare } from '@fortawesome/pro-solid-svg-icons'
-import { Creators } from 'src/redux/goals'
-import * as R from 'ramda'
-import { connect } from 'react-redux'
-
-const mapDispatchToProps = dispatch => ({
-  toggleActionStep: (goalId, actionStepId, currentStatus) => {
-    dispatch(Creators.toggleActionStep(goalId, actionStepId, !currentStatus))
-  }
-})
+import { faSquare, faCircle } from '@fortawesome/pro-regular-svg-icons'
+import {
+  faCheckSquare,
+  faCircle as faSolidCircle
+} from '@fortawesome/pro-solid-svg-icons'
+import PropTypes from 'prop-types'
 
 const ActionStep = props => {
-  var icon = props.actionStep.completed ? faCheckSquare : faSquare
-
-  const handleClick = () => {
-    props.toggleActionStep(
-      props.goalId,
-      props.actionStep.id,
-      props.actionStep.completed
-    )
-  }
+  var icon = props.isChecked
+    ? props.radio
+      ? faSolidCircle
+      : faCheckSquare
+    : props.radio
+      ? faCircle
+      : faSquare
 
   return (
-    <div onClick={handleClick}>
+    <div onClick={props.handleClick}>
       <ListItem className={props.classes.actionStep}>
         <Typography className={props.classes.actionStep}>
           {props.actionStep.title}
@@ -47,16 +40,19 @@ const ActionStep = props => {
   )
 }
 
+ActionStep.propTypes = {
+  classes: PropTypes.object.isRequired,
+  actionStep: PropTypes.object.isRequired
+}
+
+ActionStep.defaultProps = {
+  radio: false
+}
+
 const styles = {
   actionStep: {
     fontSize: 16
   }
 }
 
-export default R.pipe(
-  connect(
-    null,
-    mapDispatchToProps
-  ),
-  withStyles(styles)
-)(ActionStep)
+export default withStyles(styles)(ActionStep)

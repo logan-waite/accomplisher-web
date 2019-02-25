@@ -13,37 +13,56 @@ import { faChevronDown } from '@fortawesome/pro-regular-svg-icons'
 import classnames from 'classnames'
 import ActionStep from 'src/components/action-step'
 import * as R from 'ramda'
+import { Creators } from 'src/redux/goals'
+import { connect } from 'react-redux'
 
-const GoalCard = props => (
-  <Card className={props.classes.root}>
-    <CardContent
-      className={props.classes.content}
-      onClick={props.onExpandClick}
-    >
-      <Typography variant='h6'>{props.goal.title}</Typography>
-      <FontAwesomeIcon
-        icon={faChevronDown}
-        className={classnames(props.classes.expand, {
-          [props.classes.expandOpen]: props.expanded
-        })}
-      />
-    </CardContent>
-    <Collapse in={props.expanded} timeout='auto' unmountOnExit>
-      <Divider variant='middle' />
-      <CardContent className={props.classes.items}>
-        <List>
-          {R.values(props.goal.actionSteps).map((actionStep, index) => (
-            <ActionStep
-              key={index}
-              actionStep={actionStep}
-              goalId={props.goal.id}
-            />
-          ))}
-        </List>
+const mapDispatchToProps = dispatch => ({
+  toggleActionStep: (goalId, actionStepId, completed) => {
+    dispatch(Creators.toggleActionStep(goalId, actionStepId, !completed))
+  }
+})
+
+const GoalCard = props => {
+  const handleClick = ({ goalId, id, completed }) => event => {
+    props.toggleActionStep(goalId, id, completed)
+  }
+
+  return (
+    <Card className={props.classes.root}>
+      <CardContent
+        className={props.classes.content}
+        onClick={props.onExpandClick}
+      >
+        <Typography variant='h6'>{props.goal.title}</Typography>
+        <FontAwesomeIcon
+          icon={faChevronDown}
+          className={classnames(props.classes.expand, {
+            [props.classes.expandOpen]: props.expanded
+          })}
+        />
       </CardContent>
-    </Collapse>
-  </Card>
-)
+      <Collapse in={props.expanded} timeout='auto' unmountOnExit>
+        <Divider variant='middle' />
+        <CardContent className={props.classes.items}>
+          <List>
+            {R.values(props.goal.actionSteps).map((actionStep, index) => (
+              <ActionStep
+                key={index}
+                isChecked={actionStep.completed}
+                actionStep={actionStep}
+                goalId={props.goal.id}
+                handleClick={handleClick({
+                  goalId: props.goal.id,
+                  ...actionStep
+                })}
+              />
+            ))}
+          </List>
+        </CardContent>
+      </Collapse>
+    </Card>
+  )
+}
 
 const styles = theme => ({
   root: {
@@ -78,4 +97,10 @@ const styles = theme => ({
   }
 })
 
-export default withStyles(styles)(GoalCard)
+export default R.pipe(
+  connect(
+    null,
+    mapDispatchToProps
+  ),
+  withStyles(styles)
+)(GoalCard)
