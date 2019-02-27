@@ -1,15 +1,27 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect } from 'react'
 import {
   Typography,
   withStyles,
   TextField,
   Button,
-  List
+  List,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/pro-regular-svg-icons'
 import * as R from 'ramda'
 import ActionStep from 'src/components/action-step'
+import { Creators } from 'src/redux/goals'
+import { connect } from 'react-redux'
+
+const mapDispatchToProps = dispatch => ({
+  addGoal: ({ title, setDate, actionSteps, nextActionStep }) => {
+    dispatch(Creators.addGoal(title, setDate, actionSteps, nextActionStep))
+  }
+})
 
 const Title = ({ classes, name, handleChange }) => {
   return (
@@ -19,7 +31,7 @@ const Title = ({ classes, name, handleChange }) => {
         in 30 days, so you can start filling up your accomplishment board.
       </Typography>
       <TextField
-        name='goalTitle'
+        name='title'
         id='goal-title'
         label='Goal Title'
         className={classes.textField}
@@ -116,7 +128,7 @@ class AddGoal extends React.Component {
 
     this.state = {
       screenPosition: 0,
-      goalTitle: '',
+      title: '',
       actionSteps: {
         1: { id: 1, title: '', completed: false },
         2: { id: 2, title: '', completed: false },
@@ -150,7 +162,9 @@ class AddGoal extends React.Component {
     } else if (this.state.screenPosition === 1) {
       this.setState({ screenPosition: 2 })
     } else if (this.state.screenPosition === 2) {
-      console.log('last page!')
+      // submit to redux
+      this.props.addGoal(this.state)
+      this.props.handleClose()
     }
   }
 
@@ -174,7 +188,7 @@ class AddGoal extends React.Component {
         <Title
           classes={this.props.classes}
           handleChange={this.handleChange}
-          name={this.state.goalTitle}
+          name={this.state.title}
         />
       )
     } else if (this.state.screenPosition === 1) {
@@ -199,7 +213,7 @@ class AddGoal extends React.Component {
   }
 
   disableButton = () => {
-    if (this.state.screenPosition === 0 && this.state.goalTitle === '') {
+    if (this.state.screenPosition === 0 && this.state.title === '') {
       return true
     } else if (
       this.state.screenPosition === 1 &&
@@ -218,21 +232,27 @@ class AddGoal extends React.Component {
 
   render () {
     return (
-      <div className={this.props.classes.paper}>
-        <Typography variant='h6' id='modal-title'>
-          Add a Goal
-        </Typography>
-        {this.getCurrentScreen()}
-        <Button
-          disabled={this.disableButton()}
-          variant='contained'
-          color='primary'
-          className={this.props.classes.nextButton}
-          onClick={this.handleNext}
-        >
-          {this.state.screenPosition === 2 ? 'Submit' : 'Next'}
-        </Button>
-      </div>
+      <Dialog
+        className={this.props.classes.paper}
+        aria-labelledby='simple-modal-title'
+        aria-describedby='simple-modal-description'
+        open={this.props.isOpen}
+        onClose={this.props.handleClose}
+      >
+        <DialogTitle>Add a Goal</DialogTitle>
+        <DialogContent>{this.getCurrentScreen()}</DialogContent>
+        <DialogActions>
+          <Button
+            disabled={this.disableButton()}
+            variant='contained'
+            color='primary'
+            className={this.props.classes.nextButton}
+            onClick={this.handleNext}
+          >
+            {this.state.screenPosition === 2 ? 'Submit' : 'Next'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     )
   }
 }
@@ -250,16 +270,8 @@ const styles = theme => ({
     }
   },
   paper: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
     maxWidth: 500,
-    maxHeight: 600,
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing.unit * 4,
-    outline: 'none'
+    maxHeight: 600
   },
   textField: {
     marginTop: theme.spacing.unit
@@ -267,9 +279,9 @@ const styles = theme => ({
     // marginRight: theme.spacing.unit
   },
   nextButton: {
-    float: 'right',
-    marginRight: -theme.spacing.unit,
-    marginTop: theme.spacing.unit * 2
+    // float: 'right',
+    // marginRight: -theme.spacing.unit,
+    // marginTop: theme.spacing.unit * 2
   },
   addButton: {},
   leftIcon: {
@@ -277,4 +289,10 @@ const styles = theme => ({
   }
 })
 
-export default withStyles(styles)(AddGoal)
+export default R.pipe(
+  connect(
+    null,
+    mapDispatchToProps
+  ),
+  withStyles(styles)
+)(AddGoal)

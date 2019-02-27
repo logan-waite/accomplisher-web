@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import GoalCard from 'src/components/goal-card'
-import { withStyles, Fab, Modal } from '@material-ui/core'
+import { withStyles, Fab, Dialog } from '@material-ui/core'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 import { stateKey } from 'src/redux/goals'
@@ -54,14 +54,7 @@ class Goals extends Component {
             <FontAwesomeIcon icon={faPlus} />
           </Fab>
         </div>
-        <Modal
-          aria-labelledby='simple-modal-title'
-          aria-describedby='simple-modal-description'
-          open={this.state.modalOpen}
-          onClose={this.toggleModal}
-        >
-          <AddGoal />
-        </Modal>
+        <AddGoal isOpen={this.state.modalOpen} handleClose={this.toggleModal} />
       </div>
     )
   }

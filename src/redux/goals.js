@@ -14,20 +14,6 @@ const stateKey = 'goals'
 
 //   }
 // }
-const updateAction = completed => action => {
-  return R.assoc('completed', completed, action)
-}
-const toggleActionStep = (state, { goalId, actionStepId, completed }) => {
-  return R.evolve({
-    list: {
-      [goalId]: {
-        actionSteps: {
-          [actionStepId]: updateAction(completed)
-        }
-      }
-    }
-  })(state)
-}
 
 const initialState = {
   list: {
@@ -123,17 +109,34 @@ const initialState = {
 }
 
 const { Types, Creators } = createActions({
-  addGoal: ['title', 'setDate'],
+  addGoal: ['title', 'setDate', 'actionSteps', 'nextActionStep'],
   fetchGoals: [],
   toggleActionStep: ['goalId', 'actionStepId', 'completed']
 })
 
-const addGoal = (state, { title, completedDate }) => {
-  const newList = state.list.concat([{ title, completedDate }])
-  return R.assoc('list', newList, state)
+const addGoal = (state, { title, setDate, actionSteps, nextActionStep }) => {
+  const newId = Object.keys(state.list).length + 1
+  const newGoal = { id: newId, title, setDate, actionSteps, nextActionStep }
+  const newState = R.assoc(newId, newGoal, state.list)
+  return R.assoc('list', newState, state)
 }
 
 const fetchGoals = state => state
+
+const updateAction = completed => action => {
+  return R.assoc('completed', completed, action)
+}
+const toggleActionStep = (state, { goalId, actionStepId, completed }) => {
+  return R.evolve({
+    list: {
+      [goalId]: {
+        actionSteps: {
+          [actionStepId]: updateAction(completed)
+        }
+      }
+    }
+  })(state)
+}
 
 const reducers = createReducer(initialState, {
   [Types.ADD_GOAL]: addGoal,
